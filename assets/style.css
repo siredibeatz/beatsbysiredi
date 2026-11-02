@@ -138,3 +138,8 @@ footer nav { display: flex; flex-wrap: wrap; gap: 16px; }
 .portfolio-strip .section-tag { color: var(--red); }
 .updated-line { color: var(--on-dark-muted); font-size: 14px; }
 footer .portfolio-link { color: #fff; font-weight: 600; }
+
+/* Real app screenshot inside the phone frame (assets/app-screenshot.jpg).
+   If the file is missing, the drawn mock-up underneath shows instead. */
+.phone { position: relative; aspect-ratio: 720 / 1520; border-radius: 30px; }
+.phone .shot { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: contain; object-position: top center; padding-bottom: 8px; z-index: 2; background: #FFFFFF; }
