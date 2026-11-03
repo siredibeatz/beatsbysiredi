@@ -1,15 +1,18 @@
 /*
  * Beats By Sir Edi website settings — the only file you need to edit.
  *
- * apkUrl:  where the Android APK downloads from. With GitHub Releases, upload the
- *          APK named exactly "Beats-By-Sir-Edi.apk" to a release and this link
- *          always gives the newest one. Replace siredibeatz.
- * playUrl: your Google Play link once the app is live there. Leave '' until then
- *          (the page shows "Coming soon to Google Play").
- * version: shown under the download button.
+ * apkUrl:         Kenya app download (GitHub release asset "Beats-By-Sir-Edi.apk").
+ * apkUrlLesotho:  Lesotho app download (asset "Beats-By-Sir-Edi-Lesotho.apk").
+ * showLesotho:    true  = visitors in Lesotho get the Lesotho app by default, and
+ *                         everyone sees a link to the other edition.
+ *                 false = everyone gets the Kenya app (use while MoPay is in test mode).
+ * playUrl:        your Google Play link once the app is live there ('' until then).
+ * version:        shown under the download button.
  */
 window.SITE = {
   apkUrl: 'https://github.com/siredibeatz/beatsbysiredi/releases/latest/download/Beats-By-Sir-Edi.apk',
+  apkUrlLesotho: 'https://github.com/siredibeatz/beatsbysiredi/releases/latest/download/Beats-By-Sir-Edi-Lesotho.apk',
+  showLesotho: true,
   playUrl: '',
-  version: '1.0.0',
+  version: '1.1.0',
 };

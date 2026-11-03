@@ -143,3 +143,8 @@ footer .portfolio-link { color: #fff; font-weight: 600; }
    If the file is missing, the drawn mock-up underneath shows instead. */
 .phone { position: relative; aspect-ratio: 720 / 1520; border-radius: 30px; }
 .phone .shot { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: contain; object-position: top center; padding-bottom: 8px; z-index: 2; background: #FFFFFF; }
+
+/* Edition switch link under the download buttons */
+.alt-edition { margin-top: 8px; }
+.alt-edition a { color: #fff; font-weight: 600; }
+.hero .alt-edition { color: var(--on-dark-muted); }
