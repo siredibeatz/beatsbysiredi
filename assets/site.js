@@ -1,47 +1,59 @@
 (function () {
   var s = window.SITE || {};
 
-  // ---- Which edition? Guess from the phone's time zone (no tracking, no outside services).
+  // ---- Three editions. Pick one from the phone's time zone (no tracking, no outside services).
+  var ED = {
+    KE: { url: s.apkUrl, on: !!s.apkUrl, file: 'Beats-By-Sir-Edi.apk', btn: 'Download for Android',
+          link: 'Kenya version (M-Pesa, KSh)' },
+    LS: { url: s.apkUrlLesotho, on: !!(s.showLesotho && s.apkUrlLesotho), file: 'Beats-By-Sir-Edi-Lesotho.apk',
+          btn: 'Download for Android · Lesotho', link: 'Lesotho version (M-Pesa, EcoCash, Maloti)' },
+    GL: { url: s.apkUrlGlobal, on: !!(s.showGlobal && s.apkUrlGlobal), file: 'Beats-By-Sir-Edi-Global.apk',
+          btn: 'Download for Android · Worldwide', link: 'Worldwide version (Visa / Mastercard, US$)' },
+  };
+  var PAY = {
+    KE: ['Pay with M-Pesa', 'Secure checkout by Paystack with M-Pesa or Visa / Mastercard. Prices in Kenyan shillings.'],
+    LS: ['Pay with M-Pesa or EcoCash', 'Secure checkout by MoPay with M-Pesa, EcoCash or Visa / Mastercard. Prices in Maloti.'],
+    GL: ['Pay by card, anywhere', 'Secure checkout by Paystack with Visa or Mastercard. Prices in US dollars.'],
+  };
+
   var tz = '';
   try { tz = Intl.DateTimeFormat().resolvedOptions().timeZone || ''; } catch (e) { /* old browser */ }
   var langs = (navigator.languages || [navigator.language || '']).join(',').toLowerCase();
-  var guessLS = tz === 'Africa/Maseru' || /(^|,)st(-|,|$)/.test(langs); // Lesotho time, or Sesotho set as language
+  var guess = tz === 'Africa/Maseru' || /(^|,)st(-|,|$)/.test(langs) ? 'LS'
+    : tz === 'Africa/Nairobi' || /(^|,)sw(-|,|$)/.test(langs) ? 'KE'
+    : 'GL';
   var chosen = null;
   try { chosen = localStorage.getItem('bbe-edition'); } catch (e) { /* storage blocked */ }
-  var lesothoOn = !!(s.showLesotho && s.apkUrlLesotho);
-  var edition = lesothoOn && (chosen === 'LS' || (!chosen && guessLS)) ? 'LS' : 'KE';
+  var start = chosen && ED[chosen] && ED[chosen].on ? chosen : ED[guess].on ? guess : 'KE';
 
-  function apply(ed) {
-    edition = ed;
-    var ls = ed === 'LS';
-    var url = ls ? s.apkUrlLesotho : s.apkUrl;
-    document.querySelectorAll('[data-apk]').forEach(function (a) { if (url) a.href = url; });
-    document.querySelectorAll('[data-dl-label]').forEach(function (el) {
-      el.textContent = ls ? 'Download for Android · Lesotho' : 'Download for Android';
-    });
-    document.querySelectorAll('[data-apk-name]').forEach(function (el) {
-      el.textContent = ls ? 'Beats-By-Sir-Edi-Lesotho.apk' : 'Beats-By-Sir-Edi.apk';
-    });
+  function apply(code) {
+    var ed = ED[code];
+    document.querySelectorAll('[data-apk]').forEach(function (a) { if (ed.url) a.href = ed.url; });
+    document.querySelectorAll('[data-dl-label]').forEach(function (el) { el.textContent = ed.btn; });
+    document.querySelectorAll('[data-apk-name]').forEach(function (el) { el.textContent = ed.file; });
     document.querySelectorAll('[data-ke]').forEach(function (el) {
-      el.textContent = ls ? el.getAttribute('data-ls') : el.getAttribute('data-ke');
+      el.textContent = PAY[code][el.tagName === 'H3' ? 0 : 1];
     });
+    var others = Object.keys(ED).filter(function (k) { return k !== code && ED[k].on; });
     document.querySelectorAll('[data-alt-edition]').forEach(function (el) {
-      if (!lesothoOn) { el.hidden = true; return; }
-      el.hidden = false;
       el.textContent = '';
-      el.appendChild(document.createTextNode(ls ? 'Not in Lesotho? ' : 'In Lesotho? '));
-      var a = document.createElement('a');
-      a.href = ls ? s.apkUrl : s.apkUrlLesotho;
-      a.textContent = ls ? 'Get the Kenya version' : 'Get the Lesotho version (M-Pesa, EcoCash, Maloti)';
-      a.addEventListener('click', function (e) {
-        // switch the page over too, then let the download start
-        try { localStorage.setItem('bbe-edition', ls ? 'KE' : 'LS'); } catch (err) { /* ignore */ }
-        setTimeout(function () { apply(ls ? 'KE' : 'LS'); }, 0);
+      el.hidden = !others.length;
+      if (!others.length) return;
+      el.appendChild(document.createTextNode('Also available: '));
+      others.forEach(function (k, i) {
+        if (i) el.appendChild(document.createTextNode(' · '));
+        var a = document.createElement('a');
+        a.href = ED[k].url;
+        a.textContent = ED[k].link;
+        a.addEventListener('click', function () {
+          try { localStorage.setItem('bbe-edition', k); } catch (err) { /* ignore */ }
+          setTimeout(function () { apply(k); }, 0); // switch the page, let the download start
+        });
+        el.appendChild(a);
       });
-      el.appendChild(a);
     });
   }
-  apply(edition);
+  apply(start);
 
   document.querySelectorAll('[data-version]').forEach(function (el) { if (s.version) el.textContent = s.version; });
   var play = document.getElementById('play');
